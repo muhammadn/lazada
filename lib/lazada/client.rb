@@ -17,18 +17,37 @@ module Lazada
     include Lazada::API::Image
     include Lazada::API::Order
 
-    base_uri 'https://api.sellercenter.lazada.com.my'
-
-    def initialize(api_key, user_id)
+    def initialize(api_key, user_id, country)
       @api_key = api_key
       @user_id = user_id
+      @country = country
+    end
+
+    def select_country(country)
+      case country
+      when 'my' # malaysia
+        self.class.base_uri 'api.sellercenter.lazada.com.my'
+      when 'sg' # singapore
+        self.class.base_uri 'api.sellercenter.lazada.com.sg'
+      when 'th' # thailand
+        self.class.base_uri 'api.sellercenter.lazada.co.th'
+      when 'id' # indonesia
+        self.class.base_uri 'api.sellercenter.lazada.co.id'
+      when 'vn' # vietnam
+        self.class.base_uri 'api.sellercenter.lazada.vn'
+      when 'ph' # phillipines
+        self.class.base_uri 'api.sellercenter.lazada.com.ph'
+      else
+        raise RuntimeError, 'Lazada does not support your country at this moment.'
+      end
     end
 
     protected
 
     def request_url(action, options = {})
-      current_time_zone = 'Kuala Lumpur'
-      timestamp = Time.now.in_time_zone(current_time_zone).iso8601
+      select_country(@country)
+
+      timestamp = Time.now.iso8601
 
       parameters = {
         'Action' => action,

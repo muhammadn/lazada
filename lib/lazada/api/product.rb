@@ -102,8 +102,10 @@ module Lazada
         end
 
         # maximum image: 8
-        (8 - object[:images].size).times.each do |a|
-          params['Skus']['Sku']['Images']['Image'.dup] = ''
+        if object[:images].present?
+          (8 - object[:images].size).times.each do |a|
+            params['Skus']['Sku']['Images']['Image'.dup] = ''
+          end
         end
 
         params
