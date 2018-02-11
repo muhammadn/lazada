@@ -16,6 +16,11 @@ module Lazada
         params = { 'Image' => { 'Url' => image_url } }
         response = self.class.post(url, body: params.to_xml(root: 'Request', skip_types: true))
 
+        if ENV['RAILS_ENV'].present?
+          raise Exceptions::UnprocessableEntity, response['ErrorResponse']['Head']['ErrorMessage'] if response['ErrorResponse']
+        else
+          raise RuntimeError, response['ErrorResponse']['Head']['ErrorMessage'] if response['ErrorResponse']
+        end
         response['SuccessResponse'].present? ? response['SuccessResponse']['Body']['Image']['Url'] : ''
       end
     end

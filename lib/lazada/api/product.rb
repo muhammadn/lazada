@@ -15,6 +15,11 @@ module Lazada
 
         response = self.class.post(url, body: params.to_xml(root: 'Request', skip_types: true, dasherize: false))
 
+        if ENV['RAILS_ENV'].present?
+          raise Exceptions::UnprocessableEntity, response['ErrorResponse']['Head']['ErrorMessage'] if response['ErrorResponse']
+        else
+          raise RuntimeError, response['ErrorResponse']['Head']['ErrorMessage'] if response['ErrorResponse']
+        end
         Lazada::API::Response.new(response)
       end
 
@@ -94,7 +99,7 @@ module Lazada
         params['Skus']['Sku']['Images'].compare_by_identity
 
         if object[:images].present?
-          object[:images].each do |image|
+          object[:images].each do |key, image|
             url = migrate_image(image)
 
             params['Skus']['Sku']['Images']['Image'.dup] = url
