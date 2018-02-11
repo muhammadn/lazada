@@ -16,7 +16,7 @@ module Lazada
         response = self.class.post(url, body: params.to_xml(root: 'Request', skip_types: true, dasherize: false))
 
         if ENV['RAILS_ENV'].present?
-          raise Exceptions::UnprocessableEntity, response['ErrorResponse']['Head']['ErrorMessage'] if response['ErrorResponse']
+          raise StandardError, response['ErrorResponse']['Head']['ErrorMessage'] if response['ErrorResponse']
         else
           raise RuntimeError, response['ErrorResponse']['Head']['ErrorMessage'] if response['ErrorResponse']
         end
